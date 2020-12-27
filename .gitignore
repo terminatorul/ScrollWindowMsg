@@ -40,3 +40,5 @@
 *.VC.db
 *.ipch
 *.suo
+/.vs
+/.vs/*

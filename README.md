@@ -30,5 +30,6 @@ If no horizontal scrollbar is found, which happens for applications using with c
 
 ## Issues
 The delayed effect resulting from scroll messages accumulating in the window message queue can be fixed by:
- - designing star and stop commands for the application
- - using the mouse software suite to map different command arguments for mouse key down and mouse key up events.
+ - designing start and stop commands for the application
+ - using the mouse software suite to map different command arguments for mouse key down and mouse key up events
+ - this way start command can be mapped on mouse key down, and stop command can be mapped on mouse key up.

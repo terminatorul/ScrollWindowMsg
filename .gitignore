@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+/Debug
+/Debug/*
+/x64
+/x64*
+
+*.user
+*.VC.db
+*.ipch
+*.suo

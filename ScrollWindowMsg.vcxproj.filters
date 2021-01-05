@@ -18,5 +18,16 @@
     <ClCompile Include="ScrollWindowMsg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PropFindHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ExpatImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropFindHandler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

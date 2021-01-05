@@ -42,3 +42,4 @@
 *.suo
 /.vs
 /.vs/*
+/libstudxml/xml/x64/

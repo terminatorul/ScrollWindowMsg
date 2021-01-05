@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{B3C787E6-B23A-41BB-BF39-DFD42DEE8FDA}</UniqueIdentifier>
+      <Extensions>c;cxx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{90BC2EB8-E1F4-4ADA-AD98-FB8727184CAA}</UniqueIdentifier>
+      <Extensions>h;hxx;ixx;txx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\xml">
+      <UniqueIdentifier>{e79f4cee-8d3c-4111-a1ec-e0f238d6bc0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\xml\details">
+      <UniqueIdentifier>{1e618e13-59ec-486a-a2ef-e4a685f6f53e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\genx">
+      <UniqueIdentifier>{497194f9-5616-4f5a-9133-f5313a0a4a71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\expat">
+      <UniqueIdentifier>{7cb39802-bef5-4908-a5df-6aeeabdd1e8e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="serializer.ixx">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="value-traits.txx">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\expat.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\pre.hxx">
+      <Filter>Source Files\xml\details</Filter>
+    </ClInclude>
+    <ClInclude Include="details\post.hxx">
+      <Filter>Source Files\xml\details</Filter>
+    </ClInclude>
+    <ClInclude Include="parser.txx">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="parser.ixx">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="details\export.hxx">
+      <Filter>Source Files\xml\details</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\expat_external.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\config-vc.h">
+      <Filter>Source Files\xml\details</Filter>
+    </ClInclude>
+    <ClInclude Include="details\config.hxx">
+      <Filter>Source Files\xml\details</Filter>
+    </ClInclude>
+    <ClInclude Include="details\genx\genx.h">
+      <Filter>Source Files\genx</Filter>
+    </ClInclude>
+    <ClInclude Include="content">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="exception">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="forward">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="qname">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serializer">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="value-traits">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\ascii.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\asciitab.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\config.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\iasciitab.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\internal.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\latin1tab.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\nametab.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\utf8tab.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\xmlrole.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\xmltok.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\xmltok_impl.h">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\xmltok_ns.c">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+    <ClInclude Include="details\expat\xmltok_impl.c">
+      <Filter>Source Files\expat</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="details\expat\xmlparse.c">
+      <Filter>Source Files\expat</Filter>
+    </ClCompile>
+    <ClCompile Include="details\expat\xmlrole.c">
+      <Filter>Source Files\expat</Filter>
+    </ClCompile>
+    <ClCompile Include="details\expat\xmltok.c">
+      <Filter>Source Files\expat</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="details\expat\LICENSE">
+      <Filter>Source Files\expat</Filter>
+    </None>
+    <None Include="details\expat\README">
+      <Filter>Source Files\expat</Filter>
+    </None>
+    <None Include="details\genx\char-props.c">
+      <Filter>Source Files\genx</Filter>
+    </None>
+    <None Include="details\genx\genx.c">
+      <Filter>Source Files\genx</Filter>
+    </None>
+    <None Include="parser.cxx">
+      <Filter>Source Files\xml</Filter>
+    </None>
+    <None Include="qname.cxx">
+      <Filter>Source Files\xml</Filter>
+    </None>
+    <None Include="serializer.cxx">
+      <Filter>Source Files\xml</Filter>
+    </None>
+    <None Include="value-traits.cxx">
+      <Filter>Source Files\xml</Filter>
+    </None>
+  </ItemGroup>
+</Project>

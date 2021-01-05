@@ -1,6 +1,19 @@
 #include <Windows.h>
 #include <tchar.h>
 
+#undef min
+#undef max
+
+#if defined(_DEBUG)
+#include <iterator>
+#endif
+
+#include "PropFindHandler.hpp"
+
+#if defined(_DEBUG)
+using std::size;
+#endif
+
 static SHORT const SHIFTED = 1 << (sizeof(SHORT) * CHAR_BIT - 1);
 
 BOOL CALLBACK EnumChildProc(HWND hwndCtrl, LPARAM lParam)
@@ -96,6 +109,123 @@ HWND GetWindowUnderCursor(POINT &ptCursorPos)
     return hwndParent;
 }
 
+char const szLuaScriptLine[] = "OutputDebugMessage('Pipe script input\\n')\r\n";
+
+DWORD WINAPI PipeThreadFunction(LPVOID lpParam)
+{
+    HANDLE hNamedPipe = (HANDLE)lpParam;
+    DWORD dwWriteSize = 0;
+
+    WriteFile(hNamedPipe, szLuaScriptLine, sizeof szLuaScriptLine - 1, &dwWriteSize, NULL);
+    FlushFileBuffers(hNamedPipe);
+    DisconnectNamedPipe(hNamedPipe);
+    CloseHandle(hNamedPipe);
+
+    return 0;
+}
+
+struct
+{
+    HANDLE	hNamedPipe;
+    OVERLAPPED	overlapped;
+}
+    instances[32];
+
+bool NamedPipeServer()
+{
+    for (auto& instance : instances)
+    {
+	instance.hNamedPipe = ::CreateNamedPipe
+		    (
+			_T("\\\\.\\pipe\\GHub-script.lua"),
+			PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
+			PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_ACCEPT_REMOTE_CLIENTS,
+			PIPE_UNLIMITED_INSTANCES,
+			32,
+			32,
+			1000,
+			NULL
+		    );
+
+	if (instance.hNamedPipe)
+	{
+	    instance.overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+	    if (instance.overlapped.hEvent)
+	    {
+		BOOL fConnected = ConnectNamedPipe(instance.hNamedPipe, &instance.overlapped);
+	    }
+	    else
+		return false;
+	}
+	else
+	    return false;;
+    }
+
+    HANDLE hEvents[32];
+
+    for (unsigned i = 0; i < 32; i++)
+	hEvents[i] = instances[i].overlapped.hEvent;
+
+    unsigned count = 32;
+
+    while (count)
+    {
+	DWORD dwWaitObject = ::WaitForMultipleObjects(count, hEvents, FALSE, INFINITE);
+
+	if (dwWaitObject >= WAIT_OBJECT_0 && dwWaitObject < WAIT_OBJECT_0 + count)
+	{
+	    unsigned idx = dwWaitObject - WAIT_OBJECT_0;
+
+	    count--;
+	    ResetEvent(hEvents[idx]);
+
+	    HANDLE hThread = CreateThread(NULL, 0, PipeThreadFunction, (LPVOID)instances[idx].hNamedPipe, 0, NULL);
+
+	    if (hThread)
+		CloseHandle(hThread);
+	    else
+		return false;
+	}
+    }
+
+    return true;
+}
+
+static XML_Char const defaultRequestEncoding[] = "US-ASCII";
+
+static char const
+    xmlAllPropDocument[] = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
+"   <D:propfind xmlns:D=\"DAV:\">"
+"	<D:allprop/>"
+"	<D:include>"
+"	    <D:supported-live-property-set/>"
+"	    <D:supported-report-set/>"
+"	</D:include>"
+"   </D:propfind>",
+    xmlPropDocument[] = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
+"   <D:propfind xmlns : D = \"DAV:\" >"
+"	<D:prop xmlns:R = \"http://ns.example.com/boxschema/\">"
+"	    <R:bigbox/>"
+"	    <R:author/>"
+"	    <R:DingALing/>"
+"	    <R:Random/>"
+"	</D:prop>"
+"   </D:propfind>",
+    xmlNsPropDocument[] = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
+"   <propfind xmlns=\"DAV:\">\n"
+"	<prop xmlns:R = \"http://ns.example.com/boxschema/\">\n"
+"	    <R:bigbox/>\n"
+"	    <R:author/>\n"
+"	    <R:DingALing/>\n"
+"	    <R:Random/>\n"
+"	</prop>\n"
+"   </propfind>",
+    xmlPropNameDocument[] = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
+"    <propfind xmlns = \"DAV:\" >\n"
+"	<propname/>"
+"    </propfind>";
+
 int WinMain
 (
     HINSTANCE hInstance,
@@ -104,6 +234,65 @@ int WinMain
     int       nShowCmd
 )
 {
+    // while (NamedPipeServer())
+    //	;
+
+    PropFindHandler propFindHandler;
+    // xml::parser parser(xmlDocument, sizeof xmlDocument - 1, "PROPFIND request body"s);
+
+    propFindHandler.Create(defaultRequestEncoding);
+
+#if defined(_DEBUG)
+    bool parseSuccessful = propFindHandler.Parse(xmlAllPropDocument, static_cast<int>(size(xmlAllPropDocument) - 1), true);
+
+    if (!parseSuccessful)
+    {
+	XML_Char const *errorMessage = propFindHandler.GetErrorString();
+	size_t errorLen = strlen(errorMessage);
+	WriteFile(GetStdHandle(STD_ERROR_HANDLE), errorMessage, static_cast<DWORD>(errorLen), nullptr, nullptr);
+	WriteFile(GetStdHandle(STD_ERROR_HANDLE), "\r\n", 2, nullptr, nullptr);
+    }
+
+    if (propFindHandler.error() == PropFindHandler::RequestError::None)
+    {
+	switch (propFindHandler.requestType())
+	{
+	case PropFindHandler::Request::PropName:
+	    WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), "PropName request.\r\n", 19, nullptr, nullptr);
+	    break;
+
+	case PropFindHandler::Request::AllProps:
+	    WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), "AllProps request.\r\n", 19, nullptr, nullptr);
+	    break;
+
+	case PropFindHandler::Request::Prop:
+	    WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), "Prop request.\r\n", 15, nullptr, nullptr);
+	    break;
+	}
+
+	WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), "Properties list:\r\n", 18, nullptr, nullptr);
+
+	for (auto const &entry: propFindHandler.propertiesMap())
+	{
+	    WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), entry.first.data(), static_cast<DWORD>(entry.first.length()), nullptr, nullptr);
+	    WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), " => ", 4, nullptr, nullptr);
+	    WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), propFindHandler.namespacePrefix(entry.first).data(), static_cast<DWORD>(propFindHandler.namespacePrefix(entry.first).length()), nullptr, nullptr);
+	    WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), "\r\n", 2, nullptr, nullptr);
+
+	    for (auto const &name: entry.second)
+	    {
+		WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), "\t", 1, nullptr, nullptr);
+		WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), name.data(), static_cast<DWORD>(name.length()), nullptr, nullptr);
+		WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), "\r\n", 2, nullptr, nullptr);
+
+	    }
+	}
+    }
+
+    char inputLine[32];
+    (void)ReadFile(GetStdHandle(STD_INPUT_HANDLE), inputLine, 1, NULL, NULL);
+#endif
+
     POINT ptCursorPos { };
     HWND  hWnd = GetCursorPos(&ptCursorPos) ? GetWindowUnderCursor(ptCursorPos) : NULL;
 

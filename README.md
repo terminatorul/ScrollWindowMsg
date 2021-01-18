@@ -21,7 +21,7 @@ The problem is default scroll behavior provided by the mouse software suite work
 ## Building
 The command is currently built with Visual Studio 2019 (Community Edition).
 
-In order to send input to and driver other windows and applications, the commands in the project have to be signed using Authenticode signatures according to Microsoft instructions and examples.
+In order to send input and to drive other windows and applications, the commands in the project have to be signed using Authenticode signatures according to Microsoft instructions and examples.
 
 You can generate the needed certificates locally, and after you have done that you can sign all executables with the included `DeploySigned.ps1` script, with a command like:
 ```batch

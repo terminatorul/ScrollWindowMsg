@@ -1,9 +1,10 @@
 # ScrollWindowMsg
+Tool to implement a few UI operations on the window under the mouse cursor (instead of the currently active window with the keyboard focus):
  - Sends window messages for horizontal scrolling to the window under the mouse cursor.
  - Close / minimize / maximize / restore the window under cursor.
  - Send a number of key presses (Enter/Esc/Tab/Space/Delete/Backspace) to the window under cursor, but will bring the window to the foreground first.
 
-Simple Windows command for use with mice that can map external commands (executables) programs to mouse buttons, in my case for:
+This are simple Windows commands for use with mice that can map external commands (executables) to mouse buttons, in my case for:
  - Logitech G600 Gaming Mouse
  - Razer Naga Trinity
 

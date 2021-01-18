@@ -33,11 +33,11 @@ You can generate the needed certificates locally, and after you have done that y
 
 After building the project, use the mouse software to launch `C:\Windows\System32\WinAPI-UI-Commands\ScrollLeft.exe` / `ScrollRight.exe` when horizontal scroll buttons are pressed. You should configure the mouse software to repeat this action for as long as the button is held down.
 
-The executables need UIAccess privilege level and always run with elevated privilege. No elevation prompt (UAC prompt) is triggered, but some programs using Windows CreateProcess API function, instead of ShellExecute, will not be able to invoke the commands as expected. In my case the Logitech G HUB software would not be able to run the commands directly, so instead of the direct invocation you should configure G HUB to runn commands like:
+The executables need UIAccess privilege level and always run with elevated privilege. No elevation prompt (UAC prompt) is triggered, but programs using Windows `CreateProcess()` API function, instead of `ShellExecute()`, will not be able to invoke the commands. In my case the Logitech G HUB software would not be able to run the commands directly, so instead of the direct invocation you should configure G HUB to runn commands like:
 ```batch
         C:\Windows\System32\WinAPI-UI-Commands\UI-Cmd.exe SendDeleteKey.exe
 ```
-instead of directly running `SendDeleteKey.exe`. The `UI-Cmd.exe` process is wrapper that will use ShellExecute Windows API to start `SendDeleteKey.exe` in this case. You can give it any of the other executables available as the first argument, and pass further arguments if needed.
+The `UI-Cmd.exe` process is wrapper that will call `ShellExecute()` Windows API to start `SendDeleteKey.exe` in this case. You can give it any of the other executables available as the first argument, and you can pass further arguments if needed.
 
 After Windows Defender detects the tools as sending input to other applications it reports it as a trojan (like Wacatac.B!ml or similar). There is no such trojan or other malware in this tool, and when this happens you should open the notification from Windows Defender and "Restore" the files from quarantine, so Windows defender knows to leave it alone. 
 
@@ -49,9 +49,3 @@ The tool will use Windows API functions to find the window under the mouse curso
 If a horizontal scrollbar is found, this command will send a number of WM_HSCROLL messages to that window, according to the value of "lines per scroll" in Windows Settings.
 
 If no horizontal scrollbar is found, which happens for applications using with custom UI frameworks, the generic WM_MOUSEHWHEEL message is sent instead.
-
-## Issues
-The delayed effect resulting from scroll messages accumulating in the window message queue can be fixed by:
- - designing start and stop commands for the application
- - using the mouse software suite to map different command arguments for mouse key down and mouse key up events
- - this way start command can be mapped on mouse key down, and stop command can be mapped on mouse key up.

@@ -18,19 +18,15 @@ The command is currently built with Visual Studio 2019 (Community Edition).
 
 In order to send input to and driver other windows and applications, the commands in the project have to be signed using Authenticode signatures according to Microsoft instructions and examples.
 
-You can generate the needed certificates locally, and sign all executables with the included DeploySigned.ps1 script, with a command like:
+You can generate the needed certificates locally, and after you have done that you can sign all executables with the included `DeploySigned.ps1` script, with a command like:
 ```batch
   MkDir "%SystemRoot%\System32\WinAPI-UI-Commands"
   MkDir "%SystemRoot%\SysWOW64\WinAPI-UI-Commands"
-  CD x64\Release\
+  CD     x64\Release\
   PowerShell -ExecutionPolicy Bypass -File "DeploySigned.ps1" "%CD%" "%SystemRoot%\System32" "%SystemRoot%\SysWOW64"
 ```
 
-After building the project, use the mouse software to launch `C:\Windows\System32\WinAPI-UI-Commands\ScrollLeft.exe` / `ScrollRight.exe` when horizontal scroll buttons are pressed, with the following arguments:
-    - "left" for scrolling 3 chars to the left
-    - "right" for scrolling 3 chars to the right
-
-You should configure the mouse software to repeat this action for as long as the button is held down.
+After building the project, use the mouse software to launch `C:\Windows\System32\WinAPI-UI-Commands\ScrollLeft.exe` / `ScrollRight.exe` when horizontal scroll buttons are pressed. You should configure the mouse software to repeat this action for as long as the button is held down.
 
 The executables need UIAccess privilege level and always run with elevated privilege. No elevetion prompt (UAC prompt) is triggered, but some programs using Windows CreateProcess API function instead of ShellExecute will not be able to invoke the commands as expected. In my case the Logitech G HUB software would not be able to run the commands directly, so instead of the direct invocation you should configure G HUB to runn commands like:
 ```batch
@@ -38,7 +34,7 @@ The executables need UIAccess privilege level and always run with elevated privi
 ```
 instead of directly running `SendDeleteKey.exe`. The `UI-Cmd.exe` process is wrapper that will use ShellExecute Windows API to start `SendDeleteKey.exe` in this case. You can give it any of the other executables available as the first argument, and pass further arguments if needed.
 
-However, in case of Vim, the application takes to long to scroll, for the default repeat rate of the Logitech G HUB software (20 events per second), and the scroll messages accumulate in the window message queue. So scrolling continues after the button is released, thus creating a "delayed scrolling" effect.
+After Windows Defender detects the tools as sending input to other applications it reports it as a trojan (like Wacatac.B!ml or similar). There is no such trojan or other malware in this tool, and when this happens you should open the notification from Windows Defender and "Restore" the files from quarantine, so Windows defender knows to leave it alone. 
 
 ## How it works
 Sending keystrokes with `SendReturnKey.exe` / `SendEscapeKey.exe` / etc... generally requires bringing the window under cursor to foreground first. Unless the window ignores WM_ACTIVATE messages, meaning it is always ready to receive new input.

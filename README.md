@@ -33,7 +33,7 @@ You can generate the needed certificates locally, and after you have done that y
 
 After building the project, use the mouse software to launch `C:\Windows\System32\WinAPI-UI-Commands\ScrollLeft.exe` / `ScrollRight.exe` when horizontal scroll buttons are pressed. You should configure the mouse software to repeat this action for as long as the button is held down.
 
-The executables need UIAccess privilege level and always run with elevated privilege. No elevetion prompt (UAC prompt) is triggered, but some programs using Windows CreateProcess API function instead of ShellExecute will not be able to invoke the commands as expected. In my case the Logitech G HUB software would not be able to run the commands directly, so instead of the direct invocation you should configure G HUB to runn commands like:
+The executables need UIAccess privilege level and always run with elevated privilege. No elevation prompt (UAC prompt) is triggered, but some programs using Windows CreateProcess API function, instead of ShellExecute, will not be able to invoke the commands as expected. In my case the Logitech G HUB software would not be able to run the commands directly, so instead of the direct invocation you should configure G HUB to runn commands like:
 ```batch
         C:\Windows\System32\WinAPI-UI-Commands\UI-Cmd.exe SendDeleteKey.exe
 ```

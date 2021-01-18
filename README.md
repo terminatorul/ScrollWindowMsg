@@ -1,7 +1,7 @@
 # ScrollWindowMsg
  - Sends window messages for horizontal scrolling to the window under the mouse cursor.
  - Close / minimize / maximize / restore the window under cursor.
- - Send a number of key presses (Enter/Esc/Tab/Space/Delete/Backspace) to the window under cursor, but will bring the window under cursor to the foreground first.
+ - Send a number of key presses (Enter/Esc/Tab/Space/Delete/Backspace) to the window under cursor, but will bring the window to the foreground first.
 
 Simple Windows command for use with mice that can map external commands (executables) programs to mouse buttons, in my case for:
  - Logitech G600 Gaming Mouse

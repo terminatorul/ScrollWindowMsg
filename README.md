@@ -1,5 +1,7 @@
 # ScrollWindowMsg
-Sends WinAPI messages for horizontal scrolling to the window under the mouse cursor.
+ - Sends window messages for horizontal scrolling to the window under the mouse cursor.
+ - Close / minimize / maximize / restore the window under cursor.
+ - Send a number of key presses (Enter/Esc/Tab/Space/Delete/Backspace) to the window under cursor, but will bring the window under cursor to the foreground first.
 
 Simple Windows command for use with mice that can map external commands (executables) programs to mouse buttons, in my case for:
  - Logitech G600 Gaming Mouse
@@ -9,6 +11,8 @@ Most gaming mice (and non-gaming) can remap buttons to various functions. This c
  - with a second scroll wheel
  - with wheel tilt on the main scroll wheel
  - with extra buttons for this purpose
+ 
+ This tool is somewhat inspired by the Linux `xdo` and `xdotool` commands.
 
 ## Purpose
 The problem is default scroll behavior provided by the mouse software suite works with most, but not all, applications in case of horizontal scrolling. Some Windows applications do not respond WM_MOUSEHWHEEL message correctly, but they can handle WM_HSCROLL messages. In my case I needed horizontal scroll to work with gVim, and I also noticed WordPad would not scroll horizontally with my mice.

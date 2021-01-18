@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ScrollWindowMsg.cpp">
+    <ClCompile Include="UI-Cmd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

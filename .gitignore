@@ -33,8 +33,7 @@
 
 /Debug
 /Debug/*
-/x64
-/x64*
+x64/
 
 *.user
 *.VC.db

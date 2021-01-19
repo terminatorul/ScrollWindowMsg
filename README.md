@@ -1,4 +1,4 @@
-# ScrollWindowMsg
+# Win-UI-Commands
 Tool to implement a few UI operations on the window under the mouse cursor (instead of the currently active window with the keyboard focus):
  - Sends window messages for horizontal scrolling to the window under the mouse cursor.
  - Close / minimize / maximize / restore the window under cursor.
@@ -8,18 +8,18 @@ This are simple Windows commands for use with mice that can map external command
  - Logitech G600 Gaming Mouse
  - Razer Naga Trinity
 
-Most gaming mice (and non-gaming) can remap buttons to various functions. This command is intended for mice with suitable buttons for horizontal scrolling, usually either:
- - with a second scroll wheel
- - with wheel tilt on the main scroll wheel
- - with extra buttons for this purpose
+Most gaming mice (and non-gaming) can remap buttons to various functions. Horizontal scroll commands in this project are intended for mice with suitable buttons, usually either:
+ - a second scroll wheel or bar
+ - wheel tilt on the main scroll wheel
+ - extra buttons for this purpose
  
- This tool is somewhat inspired by the Linux `xdo` and `xdotool` commands.
+ This project is somewhat inspired by the Linux `xdo` and `xdotool` commands.
 
 ## Purpose
 The problem is default scroll behavior provided by the mouse software suite works with most, but not all, applications in case of horizontal scrolling. Some Windows applications do not respond WM_MOUSEHWHEEL message correctly, but they can handle WM_HSCROLL messages. In my case I needed horizontal scroll to work with gVim, and I also noticed WordPad would not scroll horizontally with my mice.
 
 ## Building
-The command is currently built with Visual Studio 2019 (Community Edition).
+The commands are currently built with Visual Studio 2019 (Community Edition).
 
 In order to send input and to drive other windows and applications, the commands in the project have to be signed using Authenticode signatures according to Microsoft instructions and examples.
 
@@ -27,7 +27,10 @@ You can generate the needed certificates locally, and after you have done that y
 ```batch
   MkDir "%SystemRoot%\System32\WinAPI-UI-Commands"
   MkDir "%SystemRoot%\SysWOW64\WinAPI-UI-Commands"
+  
+  @Rem go to build output directory with the unsigned binaries
   CD     x64\Release\
+  
   PowerShell -ExecutionPolicy Bypass -File "DeploySigned.ps1" "%CD%" "%SystemRoot%\System32" "%SystemRoot%\SysWOW64"
 ```
 

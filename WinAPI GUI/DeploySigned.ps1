@@ -12,19 +12,19 @@ Start-Process  `
 	-ArgumentList `
 		'/D','/C',`
 		(
-			'XCopy /D /Y /F "' + $BuildDirectory + '\*.exe" "' + $DeployDirectory + '\WinAPI-GUI-Dispatcher\\"' +
+			'XCopy /D /Y /F "' + $BuildDirectory + '\*.exe" "' + $DeployDirectory + '\Win-UI-Commands\\"' +
 				' & ' +
 			'(' +
-				'For %f In ("' + $DeployDirectory + '\WinAPI-GUI-Dispatcher\*.exe") Do ' +
+				'For %f In ("' + $DeployDirectory + '\Win-UI-Commands\*.exe") Do ' +
 				'@(' +
 						'@"' + $SignToolExe + '" verify /pa /q "%~f" >NUL' +
 							' & ' +
 						'@If ErrorLevel 1 ' +
-							'"' + $SignToolExe + '" sign /a /fd SHA512 /d "WinAPI GUI Commands" "%~f"' +
+							'"' + $SignToolExe + '" sign /a /fd SHA512 /d "Windows UI Commands" "%~f"' +
 				')' +
 			')' +
 				' & ' +
-			'(If Exist "' + $AlternateDeployDirectory + '" XCopy /D /F /Y /I "' + $DeployDirectory + '\WinAPI-GUI-Dispatcher\*.exe" "' + $AlternateDeployDirectory + '\WinAPI-GUI-Dispatcher\\")' +
+			'(If Exist "' + $AlternateDeployDirectory + '" XCopy /D /F /Y /I "' + $DeployDirectory + '\Win-UI-Commands\*.exe" "' + $AlternateDeployDirectory + '\Win-UI-Commands\\")' +
 				' & ' +
 			'Pause' `
 		)

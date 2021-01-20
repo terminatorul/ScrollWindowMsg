@@ -2,7 +2,7 @@
 Tool to implement a few UI operations on the window under the mouse cursor (instead of the currently active window with the keyboard focus):
  - Sends window messages for horizontal scrolling to the window under the mouse cursor.
  - Close / minimize / maximize / restore the window under cursor.
- - Send a number of key presses (Enter/Esc/Tab/Space/Delete/Backspace) to the window under cursor, but will bring the window to the foreground first.
+ - Send a number of key presses (Enter/Esc/Tab/Space/Delete/Backspace) to the window under cursor, but will bring the window to the foreground first. If that window closes as a result, original window will be brought back to focus.
 
 This are simple Windows commands for use with mice that can map external commands (executables) to mouse buttons, in my case for:
  - Logitech G600 Gaming Mouse
@@ -12,7 +12,7 @@ Most gaming mice (and non-gaming) can remap buttons to various functions. Horizo
  - a second scroll wheel or bar
  - wheel tilt on the main scroll wheel
  - extra buttons for this purpose
- 
+
  This project is somewhat inspired by the Linux `xdo` and `xdotool` commands.
 
 ## Purpose
@@ -36,7 +36,7 @@ You can generate the needed certificates locally, and after you have done that y
 
 After building the project, use the mouse software to launch `C:\Windows\System32\WinAPI-UI-Commands\ScrollLeft.exe` / `ScrollRight.exe` when horizontal scroll buttons are pressed. You should configure the mouse software to repeat this action for as long as the button is held down.
 
-The executables need UIAccess privilege level and always run with elevated privilege. No elevation prompt (UAC prompt) is triggered, but programs using Windows `CreateProcess()` API function, instead of `ShellExecute()`, will not be able to invoke the commands. In my case the Logitech G HUB software would not be able to run the commands directly, so instead of the direct invocation you should configure G HUB to runn commands like:
+The executables need UIAccess privilege level and always run with elevated privilege. No elevation prompt (UAC prompt) is triggered, but a program using Windows `CreateProcess()` API function, instead of `ShellExecute()`, will not be able to invoke the commands. In my case the Logitech G HUB software was not be able to run the commands directly, so instead of the direct invocation you should configure G HUB to run commands like:
 ```batch
         C:\Windows\System32\WinAPI-UI-Commands\UI-Cmd.exe SendDeleteKey.exe
 ```

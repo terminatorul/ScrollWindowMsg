@@ -7,12 +7,16 @@
 #include <iterator>
 #include <string>
 #include <sstream>
+#include <memory>
+#include <functional>
 
 #include "RemoteProcessSearch.hpp"
 #include "GUI Search.hpp"
 
 using std::size;
 using std::to_wstring;
+using std::unique_ptr;
+using std::function;
 
 static_assert(sizeof(HWND) == sizeof(LPVOID), "Expected same size for HWND and LPVOID to inject GUI calls to other processes.");
 
@@ -90,10 +94,25 @@ int SendSysCommandMessage(HWND hWnd, UINT iSysCommandMessage, POINT &ptCursorPos
 {
     if (hWnd)
     {
-	hWnd = GetTopLevelParentWindow(hWnd, (iSysCommandMessage != SC_CLOSE));
+	hWnd = GetTopLevelParentWindow(hWnd, false);
 
 	if (hWnd)
 	{
+	    LONG lWndStyle = ::GetWindowLong(hWnd, GWL_STYLE);
+
+	    switch (iSysCommandMessage)
+	    {
+	    case SC_MINIMIZE:
+		if (!(lWndStyle & WS_MINIMIZEBOX))
+		    return -1;
+		break;
+	    case SC_MAXIMIZE:
+	    case SC_RESTORE:
+		if (!(lWndStyle & WS_MAXIMIZEBOX))
+		    return -1;
+		break;
+	    }
+
 	    PostMessage(hWnd, WM_SYSCOMMAND, iSysCommandMessage, MAKELPARAM(ptCursorPos.x, ptCursorPos.y));
 
 	    return 0;
@@ -114,7 +133,7 @@ LPARAM MakeKeystrokeLParamFlags(bool extendedKey, bool dialogMode, bool systemCo
 	MAKELPARAM
 	    (
 		0, 
-		(extendedKey ? KF_EXTENDED : 0) | (dialogMode ? KF_DLGMODE : 0) | (systemContext ? KF_ALTDOWN : 0) 
+		(extendedKey ? KF_EXTENDED : 0) | (dialogMode ? KF_DLGMODE : 0) | (systemContext ? KF_ALTDOWN : 0)
 		    |
 		(previousState ? KF_REPEAT : 0) | (releaseTransition ? KF_UP : 0)
 	    );
@@ -143,7 +162,7 @@ DWORD RemoteFunctionCall(HANDLE hRemoteProcess, LPCTSTR szModuleName, LPCTSTR sz
 		}
 
 		DWORD dwError = ::GetLastError();
-		OutputDebugString(TEXT("SendKey: No exit code from remote thread !"));
+		GUI_DebugString(TEXT("SendKey: No exit code from remote thread !"));
 		::CloseHandle(hRemoteThread);
 
 		return dwError;
@@ -253,7 +272,7 @@ void PostKeyUpDownMessages(HWND hTargetWnd, WORD vKey, BYTE uScanCode, bool exte
     else
 	GUI_DebugString(TEXT("SendKey: PostMessage error"));
 
-    OutputDebugString((std::basic_string<TCHAR>(TEXT("Focus window: ")) + str.str()).data());
+    GUI_DebugString((std::basic_string<TCHAR>(TEXT("Focus window: ")) + str.str()).data());
 #endif
 }
 
@@ -267,12 +286,12 @@ bool BringWindowToForeground(HWND hRootWnd)
 
 	if (dwRemoteCallError == ERROR_SUCCESS && dwFunctionResult)
 	{
-	    OutputDebugString(TEXT("SendKey: Target window brought to foreground!"));
+	    GUI_DebugString(TEXT("SendKey: Target window brought to foreground!"));
 	    return true;
 	}
 	else
 	{
-	    OutputDebugString(TEXT("SendKey: Target window not brought to foreground !"));
+	    GUI_DebugString(TEXT("SendKey: Target window not brought to foreground !"));
 	}
 
 	::CloseHandle(hForegroundProcess);
@@ -290,15 +309,56 @@ int SendKeyCode(HWND hWnd, WORD vKey, bool extendedKey)
     }
 
     bool isMenuMode;
-    HWND hWndActive, hWndFocus = GetCaretWindow(hWnd, hWndActive, isMenuMode), hRootWnd = ::GetAncestor(hWnd, GA_ROOT);
+    DWORD dwForegroundWindowThreadID;
+    HWND
+	hWndForeground = NULL,
+	hWndActive,
+	hWndFocus = GetCaretWindow(hWnd, hWndActive, isMenuMode), hRootWnd = ::GetAncestor(hWnd, GA_ROOT);
     bool isTargetWindowActive = (hWndActive == hRootWnd);
 
+    unique_ptr<HWND, function<void (HWND *)>>
+	foregroundWndGuard(&hWndForeground, [&hRootWnd, &dwForegroundWindowThreadID](HWND *pWndForeground) -> void
+	    {
+		Sleep(200);
+		HWND hForeground = ::GetForegroundWindow();
+
+		if
+		    ( 
+			*pWndForeground && hForeground != hRootWnd && ::GetAncestor(GetParent(hForeground), GA_ROOT) != hRootWnd
+			    &&
+			hForeground != *pWndForeground
+			    &&
+			(
+			    GetWindowThreadProcessId(hForeground, NULL) == dwForegroundWindowThreadID
+				||
+			    hForeground == ::GetAncestor(::GetShellWindow(), GA_ROOT) || hForeground == ::GetAncestor(::GetDesktopWindow(), GA_ROOT)
+				||
+			    HasWindowClass(hForeground, TEXT("Shell_TrayWnd"), static_cast<DWORD>(size(TEXT("Shell_TrayWnd")) - 1))
+			)
+		    )
+		{
+		    if (!BringWindowToForeground(*pWndForeground))
+		    {
+			::SetForegroundWindow(*pWndForeground);
+		    }
+		}
+		else
+		{
+		    GUI_DebugString((TEXT("Allow new foreground window: ") + std::to_wstring((uintptr_t)(void *)hForeground)).data());
+		}
+	    });
+
     if (!isTargetWindowActive || !hWndFocus)
+    {
+	hWndForeground = ::GetForegroundWindow();
+	dwForegroundWindowThreadID = ::GetWindowThreadProcessId(hRootWnd, NULL);
+
 	if (!BringWindowToForeground(hRootWnd))
 	{
 	    ::SetForegroundWindow(hRootWnd);
-	    Sleep(50);
+	    Sleep(75);
 	}
+    }
 
     if (hWndFocus && isTargetWindowActive || ::GetForegroundWindow() == hRootWnd)
     {
@@ -323,7 +383,7 @@ int SendKeyCode(HWND hWnd, WORD vKey, bool extendedKey)
 #if defined(DEBUG) || defined(_DEBUG)
     else
     {
-	OutputDebugString(TEXT("SendKey: No focus window found for target thread 2 !."));
+	GUI_DebugString(TEXT("SendKey: No focus window found for target thread 2 !."));
 
     }
 #endif

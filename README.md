@@ -25,8 +25,8 @@ In order to send input and to drive other windows and applications, the commands
 
 You can generate the needed certificates locally, and after you have done that you can sign all executables with the included `DeploySigned.ps1` script, with a command like:
 ```batch
-  MkDir "%SystemRoot%\System32\WinAPI-UI-Commands"
-  MkDir "%SystemRoot%\SysWOW64\WinAPI-UI-Commands"
+  MkDir "%SystemRoot%\System32\Win-UI-Commands"
+  MkDir "%SystemRoot%\SysWOW64\Win-UI-Commands"
   
   @Rem go to build output directory with the unsigned binaries
   CD     x64\Release\
@@ -34,11 +34,11 @@ You can generate the needed certificates locally, and after you have done that y
   PowerShell -ExecutionPolicy Bypass -File "DeploySigned.ps1" "%CD%" "%SystemRoot%\System32" "%SystemRoot%\SysWOW64"
 ```
 
-After building the project, use the mouse software to launch `C:\Windows\System32\WinAPI-UI-Commands\ScrollLeft.exe` / `ScrollRight.exe` when horizontal scroll buttons are pressed. You should configure the mouse software to repeat this action for as long as the button is held down.
+After building the project, use the mouse software to launch `C:\Windows\System32\API-UI-Commands\ScrollLeft.exe` / `ScrollRight.exe` when horizontal scroll buttons are pressed. You should configure the mouse software to repeat this action for as long as the button is held down.
 
 The executables need UIAccess privilege level and always run with elevated privilege. No elevation prompt (UAC prompt) is triggered, but a program using Windows `CreateProcess()` API function, instead of `ShellExecute()`, will not be able to invoke the commands. In my case the Logitech G HUB software was not be able to run the commands directly, so instead of the direct invocation you should configure G HUB to run commands like:
 ```batch
-        C:\Windows\System32\WinAPI-UI-Commands\UI-Cmd.exe SendDeleteKey.exe
+        C:\Windows\System32\Win-UI-Commands\UI-Cmd.exe SendDeleteKey.exe
 ```
 The `UI-Cmd.exe` process is wrapper that will call `ShellExecute()` Windows API to start `SendDeleteKey.exe` in this case. You can give it any of the other executables available as the first argument, and you can pass further arguments if needed.
 
